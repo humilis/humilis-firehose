@@ -14,7 +14,7 @@ from humilis.environment import Environment
 
 @pytest.fixture(scope="session", params=[1, 10, 100])
 def events(request):
-    """A batch of events to be ingested by Kinesis."""
+    """A batch of events to be sent to the delivery stream."""
     return [{
         "event_id": str(uuid.uuid4()).replace('-', ''),
         "timestamp": '2016-01-22T01:45:44.235+01:00',
@@ -43,39 +43,27 @@ def environment(settings):
     return env
 
 
-@pytest.fixture(scope="session", params=['InputStream', 'OutputStream'])
-def io_stream_name(settings, environment, request):
-    """The name of the input and output streams in the rawpipe layer."""
+@pytest.fixture(scope="session", params=['DeliveryStream1', 'DeliveryStream2'])
+def stream_name(settings, environment, request):
+    """The name of a delivery stream."""
     layer = [l for l in environment.layers if l.name == settings.layer_name][0]
     return layer.outputs.get(request.param)
 
 
 @pytest.fixture(scope="session")
-def kinesis():
+def firehose():
     """Boto3 kinesis client."""
-    return boto3.client('kinesis')
+    return boto3.client('firehose')
 
 
-def test_io_streams_put_get_record(kinesis, io_stream_name, payloads):
-    """Put and read a record from the input stream."""
-    response = kinesis.put_records(
-        StreamName=io_stream_name,
+def test_put_record_batch(firehose, stream_name, payloads):
+    """Put some records to Firehose and check they are delivered to S3."""
+    response = firehose.put_record_batch(
+        DeliveryStreamName=stream_name,
         Records=[
             {
                 "Data": payload,
-                "PartitionKey": str(uuid.uuid4())
             } for payload in payloads])
 
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
-    seqnb = response['Records'][0]['SequenceNumber']
-    shardid = response['Records'][0]['ShardId']
-    # Try to read the data back from kinesis
-    response = kinesis.get_shard_iterator(
-        StreamName=io_stream_name,
-        ShardId=shardid,
-        ShardIteratorType='AT_SEQUENCE_NUMBER',
-        StartingSequenceNumber=seqnb)
-    record = kinesis.get_records(
-        ShardIterator=response['ShardIterator'],
-        Limit=1)['Records'][0]
-    assert record['Data'].decode() == payloads[0]
+    # todo: test that all records are delivered to S3 within a ~2 mins

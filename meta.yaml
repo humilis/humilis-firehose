@@ -1,7 +1,7 @@
 ---
 meta:
     description:
-        Creates an input and output Kinesis stream for an event processing pipeline
+        Creates Firehose delivery streams that deliver records to S3
     dependencies:
         - firehose-rsc
         - storage

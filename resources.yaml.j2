@@ -1,7 +1,7 @@
 ---
 resources:
     {% for stream in streams %}
-    {{stream}}:
+    {{stream.name}}:
       Type: 'Custom::Firehose'
       Properties:
         ServiceToken: {{firehose_resource_function_arn}}
@@ -50,5 +50,5 @@ resources:
                   Resource:
                     "Fn::Join":
                       - ""
-                      - ["arn:aws:s3:::", "{{delivery.bucket_name}}/{{_env.name}}/{{_layer.name}}/*"]
+                      - ["arn:aws:s3:::", "{{delivery_settings.bucket_name}}/{{_env.name}}/{{_layer.name}}/*"]
     {% endfor %}

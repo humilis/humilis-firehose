@@ -1,5 +1,5 @@
 ---
-delivery:
+s3-delivery:
     description:
         A dummy environment used for testing the delivery layer.
     tags:
