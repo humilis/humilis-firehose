@@ -5,7 +5,7 @@ HUMILIS_ENV := s3-delivery
 
 # create virtual environment
 .env:
-	virtualenv .env -p python3.4
+	virtualenv .env -p python3.5
 
 # create symlinks
 symlinks:
@@ -27,10 +27,15 @@ clean:
 	rm -f layers/$(HUMILIS_ENV)
 
 create: develop
-	$(HUMILIS) create --stage $(STAGE) $(HUMILIS_ENV).yaml
+	$(HUMILIS) create \
+	  --stage $(STAGE) \
+	  --output $(HUMILIS_ENV)-$(STAGE).outputs.yaml $(HUMILIS_ENV).yaml
 
 update: develop
-	$(HUMILIS) update --stage $(STAGE) $(HUMILIS_ENV).yaml
+	$(HUMILIS) update \
+	  --stage $(STAGE) \
+	  --output $(HUMILIS_ENV)-$(STAGE).outputs.yaml $(HUMILIS_ENV).yaml
 
 delete: develop
+	$(PYTHON) scripts/empty-bucket.py $(HUMILIS_ENV)-$(STAGE).outputs.yaml
 	$(HUMILIS) delete --stage $(STAGE) $(HUMILIS_ENV).yaml
