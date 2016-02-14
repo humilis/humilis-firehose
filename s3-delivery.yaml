@@ -1,0 +1,18 @@
+---
+delivery:
+    description:
+        A dummy environment used for testing the delivery layer.
+    tags:
+        "cost:chapter": "data"
+        "cost:squad": "product"
+        "cost:project": "nfh-event-tracker"
+    layers:
+        # The storage layer
+        - {layer: storage}
+        - {layer: firehose-rsc}
+        - layer: s3-delivery
+          streams:
+              - name: DeliveryStream1
+                prefix: str1/
+              - name: DeliveryStream2
+                prefix: str2/

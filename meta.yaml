@@ -1,0 +1,36 @@
+---
+meta:
+    description:
+        Creates an input and output Kinesis stream for an event processing pipeline
+    dependencies:
+        - firehose-rsc
+        - storage
+    parameters:
+        firehose_resource_function_arn:
+            description:
+                The ARN of the Lambda function that backs the custom Firehose resource
+            value:
+                ref:
+                    parser: output
+                    parameters:
+                        layer_name: firehose-rsc
+                        output_name: CustomResourceFunctionArn
+        delivery_settings:
+            description:
+                Common settings for all delivery stream(s)
+            value:
+                bucket_name:
+                    ref:
+                        parser: output
+                        parameters:
+                            layer_name: storage
+                            output_name: BucketName
+                buffer_mbs: 1
+                buffer_seconds: 60
+                compression: GZIP
+        streams:
+            description:
+                The names of the streams and the associated S3 prefixes
+            value:
+                - name: DeliveryStream
+                  prefix: stream/
