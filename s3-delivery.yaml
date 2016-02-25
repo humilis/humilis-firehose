@@ -8,8 +8,8 @@ s3-delivery:
         "cost:project": "nfh-event-tracker"
     layers:
         # The storage layer
-        - {layer: storage}
-        - {layer: firehose-rsc}
+        - layer: storage
+        - layer: firehose-rsc
         - layer: s3-delivery
           streams:
               - name: DeliveryStream1

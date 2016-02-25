@@ -15,7 +15,7 @@ meta:
                     parameters:
                         layer_name: firehose-rsc
                         output_name: CustomResourceFunctionArn
-        delivery_settings:
+        s3_delivery:
             description:
                 Common settings for all delivery stream(s)
             value:
@@ -28,9 +28,34 @@ meta:
                 buffer_mbs: 1
                 buffer_seconds: 60
                 compression: GZIP
+        redshift_delivery:
+            description:
+                Common Redshift delivery settings for all streams
+            value:
+                cluster_jdbc_url:
+                    ref:
+                        parser: secret
+                        parameters:
+                            service: "humilis:s3-delivery:redshift"
+                            key: jdbc_url
+                copy_options: GZIP
+                username:
+                    ref:
+                        parser: secret
+                        parameters:
+                            service: "humilis:s3-delivery:redshift"
+                            key: username
+                password:
+                    ref:
+                        parser: secret
+                        parameters:
+                            service: "humilis:s3-delivery:redshift"
+                            key: password 
         streams:
             description:
-                The names of the streams and the associated S3 prefixes
+                The names of the streams and the associated S3 prefixes and, 
+                optionally, Redshift tables.
             value:
                 - name: DeliveryStream
                   prefix: stream/
+                  table: "_test.stream"
