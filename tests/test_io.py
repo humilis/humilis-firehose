@@ -15,13 +15,13 @@ from humilis.environment import Environment
 @pytest.fixture(scope="session", params=[1, 10, 100])
 def events(request):
     """A batch of events to be sent to the delivery stream."""
-    return [{
-        "event_id": str(uuid.uuid4()).replace('-', ''),
-        "timestamp": '2016-01-22T01:45:44.235+01:00',
-        "client_id": "1628457772.1449082074",
-        "url": "http://staging.findhotel.net/?lang=nl-NL",
-        "referrer": "http://staging.findhotel.net/"
-        } for _ in range(request.param)]
+    return [','.join([
+        str(uuid.uuid4()).replace("-", ""),
+        "2016-01-22T01:45:44.235+01:00",
+        "1628457772.1449082074",
+        "http://staging.findhotel.net/?lang=nl-NL",
+        "http://staging.findhotel.net/"
+        ]) for _ in range(request.param)]
 
 
 @pytest.fixture(scope="session")

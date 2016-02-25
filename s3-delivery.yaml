@@ -14,5 +14,7 @@ s3-delivery:
           streams:
               - name: DeliveryStream1
                 prefix: str1/
+                table: "_test.stream1"
               - name: DeliveryStream2
                 prefix: str2/
+                table: "_test.stream2"
