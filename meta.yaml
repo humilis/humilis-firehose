@@ -32,25 +32,31 @@ meta:
             description:
                 Common Redshift delivery settings for all streams
             value:
-                cluster_jdbc_url:
-                    ref:
-                        parser: secret
-                        parameters:
-                            service: "{{secrets_namespace}}"
-                            key: jdbc_url
                 copy_options: CSV GZIP
-                username:
-                    ref:
-                        parser: secret
-                        parameters:
-                            service: "{{secrets_namespace}}"
-                            key: username
-                password:
-                    ref:
-                        parser: secret
-                        parameters:
-                            service: "{{secrets_namespace}}"
-                            key: password 
+        cluster_jdbc_url:
+            description: The JDBC URL of the cluster
+            value:
+                ref:
+                    parser: secret
+                    parameters:
+                        service: "{{secrets_namespace}}"
+                        key: jdbc_url
+        redshift_username:
+            description: Redshift username
+            value:
+                ref:
+                    parser: secret
+                    parameters:
+                        service: "{{secrets_namespace}}"
+                        key: username
+        redshift_password:
+            description: Redshift password
+            value:
+                ref:
+                    parser: secret
+                    parameters:
+                        service: "{{secrets_namespace}}"
+                        key: password
         streams:
             description:
                 The names of the streams and the associated S3 prefixes and, 

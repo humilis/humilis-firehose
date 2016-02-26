@@ -21,12 +21,12 @@ resources:
           CompressionFormat: {{s3_delivery.compression}}
         {% if redshift_delivery %}
         RedshiftDestinationConfiguration:
-          ClusterJDBCURL: {{redshift_delivery.cluster_jdbc_url}}
+          ClusterJDBCURL: {{cluster_jdbc_url}}
           CopyCommand:
             DataTableName: {{stream.table}}
             CopyOptions: {{redshift_delivery.copy_options}}
-          Username: {{redshift_delivery.username}}
-          Password: {{redshift_delivery.password}}
+          Username: {{redshift_username}}
+          Password: {{redshift_password}}
         {% endif %}
     DeliveryStreamRole:
       Type: 'AWS::IAM::Role'
