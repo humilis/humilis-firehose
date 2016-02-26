@@ -1,7 +1,7 @@
 HUMILIS := .env/bin/humilis
 PYTHON := .env/bin/python
 STAGE := DEV
-HUMILIS_ENV := s3-delivery
+HUMILIS_ENV := firehose
 
 # create virtual environment
 .env:

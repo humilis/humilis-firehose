@@ -8,5 +8,5 @@ def settings():
     """Global test settings."""
     Settings = namedtuple('Settings', 'stage environment_path layer_name')
     return Settings(stage="DEV",
-                    environment_path="s3-delivery.yaml",
-                    layer_name="s3-delivery")
+                    environment_path="firehose.yaml",
+                    layer_name="firehose")

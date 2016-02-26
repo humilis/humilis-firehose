@@ -1,7 +1,7 @@
 ---
 meta:
     description:
-        Creates Firehose delivery streams that deliver records to S3
+        Creates Firehose delivery streams that deliver records to S3/Redshift
     dependencies:
         - firehose-rsc
         - storage
@@ -38,7 +38,7 @@ meta:
                         parameters:
                             service: "humilis:s3-delivery:redshift"
                             key: jdbc_url
-                copy_options: GZIP
+                copy_options: CSV GZIP
                 username:
                     ref:
                         parser: secret

@@ -3,9 +3,7 @@
 Tests the input and output Kinesis streams
 """
 
-import base64
 import pytest
-import json
 import uuid
 
 import boto3
@@ -21,18 +19,7 @@ def events(request):
         "1628457772.1449082074",
         "http://staging.findhotel.net/?lang=nl-NL",
         "http://staging.findhotel.net/"
-        ]) for _ in range(request.param)]
-
-
-@pytest.fixture(scope="session")
-def payloads(events):
-    """A base 64 encoded data record."""
-    payloads = []
-    for kr in events:
-        record = json.dumps(kr)
-        payload = base64.encodestring(record.encode('utf-8')).decode()
-        payloads.append(payload)
-    return payloads
+        ]) + "\n" for _ in range(request.param)]
 
 
 @pytest.fixture(scope="session")
@@ -56,14 +43,9 @@ def firehose():
     return boto3.client('firehose')
 
 
-def test_put_record_batch(firehose, stream_name, payloads):
+def test_put_record_batch(firehose, stream_name, events):
     """Put some records to Firehose and check they are delivered to S3."""
-    response = firehose.put_record_batch(
+    resp = firehose.put_record_batch(
         DeliveryStreamName=stream_name,
-        Records=[
-            {
-                "Data": payload,
-            } for payload in payloads])
-
-    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
-    # todo: test that all records are delivered to S3 within a ~2 mins
+        Records=[{"Data": event} for event in events])
+    assert resp['ResponseMetadata']['HTTPStatusCode'] == 200
