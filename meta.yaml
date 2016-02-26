@@ -36,20 +36,20 @@ meta:
                     ref:
                         parser: secret
                         parameters:
-                            service: "humilis:s3-delivery:redshift"
+                            service: "{{secrets_namespace}}"
                             key: jdbc_url
                 copy_options: CSV GZIP
                 username:
                     ref:
                         parser: secret
                         parameters:
-                            service: "humilis:s3-delivery:redshift"
+                            service: "{{secrets_namespace}}"
                             key: username
                 password:
                     ref:
                         parser: secret
                         parameters:
-                            service: "humilis:s3-delivery:redshift"
+                            service: "{{secrets_namespace}}"
                             key: password 
         streams:
             description:
