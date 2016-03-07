@@ -1,41 +1,34 @@
 HUMILIS := .env/bin/humilis
+PIP := .env/bin/pip
 PYTHON := .env/bin/python
+TOX := .env/bin/tox
 STAGE := DEV
-HUMILIS_ENV := firehose
+HUMILIS_ENV := tests/integration/firehose
 
 # create virtual environment
 .env:
-	virtualenv .env -p python3.5
+	virtualenv .env -p python3
 
-# create symlinks
-symlinks:
-	mkdir -p layers
-	rm -f layers/$(HUMILIS_ENV)
-	ln -fs ../ layers/$(HUMILIS_ENV)
-
-# install dev dependencies
-develop: .env symlinks
+# install dev dependencies, create layers directory
+develop: .env
 	.env/bin/pip install -r requirements-dev.txt
 
-# run test suite
-test: develop
-	.env/bin/tox
+# run unit tests
+test: .env
+	$(TOX)
 
-# remove virtualenv and layers dir
+# remove .tox and .env dirs
 clean:
-	rm -rf .env
-	rm -f layers/$(HUMILIS_ENV)
+	rm -rf .env .tox
 
+# deploy the test environment
 create: develop
-	$(HUMILIS) create \
-	  --stage $(STAGE) \
-	  --output $(HUMILIS_ENV)-$(STAGE).outputs.yaml $(HUMILIS_ENV).yaml
+	$(HUMILIS) create --stage $(STAGE) $(HUMILIS_ENV).yaml
 
+# update the test deployment
 update: develop
-	$(HUMILIS) update \
-	  --stage $(STAGE) \
-	  --output $(HUMILIS_ENV)-$(STAGE).outputs.yaml $(HUMILIS_ENV).yaml
+	$(HUMILIS) update --stage $(STAGE) $(HUMILIS_ENV).yaml
 
+# delete the test deployment
 delete: develop
-	$(PYTHON) scripts/empty-bucket.py $(HUMILIS_ENV)-$(STAGE).outputs.yaml
 	$(HUMILIS) delete --stage $(STAGE) $(HUMILIS_ENV).yaml

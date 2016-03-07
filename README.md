@@ -1,27 +1,18 @@
-S3 delivery
-==================
+Firehose delivery layer for humilis
+===================================
 
-This repository contains a [humilis][humilis] layer that deploys
-one ore more [Firehose delivery streams][firehose] to deliver events to S3.
-This repository is not intended to stand on its own but to be part of a larger
-humilis _environment_. See [humilis][humilis] documentation for more 
-information.
+A [humilis][humilis] plug-in layer that deploys one ore more 
+[Firehose delivery streams][firehose] to deliver events to S3.
 
 [firehose]: http://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html
 [humilis]: https://github.com/InnovativeTravel/humilis
 
 
-## Requirements
-
-You need to install [humilis][humilis] and configure a local profile:
+## Installation
 
 ```
-humilis configure --local
+pip install git+https://github.com/InnovativeTravel/humilis-firehose
 ```
-
-The command above will create a `.humilis.ini` file that you can keep with the
-rest of your code. This repository contains one such file with values that make
-sense for people working at Innovative Travel.
 
 
 ## Development
@@ -34,69 +25,33 @@ Assuming you have [virtualenv][venv] installed:
 make develop
 ```
 
-
-## Testing
-
-To run the local test suite:
+Configure humilis:
 
 ```
-make test
-```
-
-
-## Development
-
-Assuming you have [virtualenv][virtualenv] installed:
-
-[virtualenv]: https://virtualenv.readthedocs.org/en/latest/
-
-```
-make develop
+.env/bin/humilis configure --local
 ```
 
 
 ## Testing
 
-To run the test suite (requires deployment):
+There is no logic in this layer beyond the deployment of AWS resources so 
+there is no unit test suite. You can test the deployment of the Firehose
+delivery streams with:
+
+```bash
+make create
+```
+
+Then you can run integration tests using:
 
 ```
 make test
 ```
 
-This layer does not contain any logic beyond the deployment of several AWS 
-resources. Therefore there is no local test suite and the tests simply assess 
-that the deployment work as expected. This means that you cannot run the test 
-suite without deploying first. Keep reading for deployment instructions.
+Don't forget to delete the deployment after you are done:
 
-
-## Deployment
-
-```
-make create 
-```
-
-This will deploy to a _humilis_ stage called `DEV`. You can decide
-to deploy on a different stage (e.g. `TEST`) by running:
-
-```
-make STAGE=TEST create
-```
-
-The test suite expects a deployment in a `DEV` stage.
-
-Remember to delete the deployment when you are done with testing:
-
-```
+```bash
 make delete
-```
-
-Alternatively you can just run `make clean` to delete the deployment and the
-development virtualenv.
-
-To deploy updates to an existing deployment run:
-
-```
-make update
 ```
 
 
@@ -104,7 +59,9 @@ make update
 
 See [humilis][humilis] documentation.
 
+[humilis]: https://github.com/InnovativeTravel/humilis/blob/master/README.md
+
 
 ## Who do I ask?
 
-Ask [German](mailto:german@innovativetravel.eu)
+Ask [German](mailto:german@innovativetravel.eu).

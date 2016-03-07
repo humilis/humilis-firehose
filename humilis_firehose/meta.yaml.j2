@@ -2,9 +2,12 @@
 meta:
     description:
         Creates Firehose delivery streams that deliver records to S3/Redshift
+    {% if dependencies %}
     dependencies:
-        - firehose-rsc
-        - storage
+        {% for dep in dependencies %}
+        - dep
+        {% endfor %}
+    {% endif %}
     parameters:
         firehose_resource_function_arn:
             description:
@@ -13,7 +16,7 @@ meta:
                 ref:
                     parser: output
                     parameters:
-                        layer_name: firehose-rsc
+                        layer_name: {{firehose_rsc_layer or "firehose-rsc"}}
                         output_name: CustomResourceFunctionArn
         s3_delivery:
             description:
@@ -23,7 +26,7 @@ meta:
                     ref:
                         parser: output
                         parameters:
-                            layer_name: storage
+                            layer_name: {{storage_layer or "storage"}}
                             output_name: BucketName
                 buffer_mbs: 1
                 buffer_seconds: 60

@@ -2,15 +2,15 @@
 firehose:
     description:
         A dummy environment used for testing the firehose layer.
-    tags:
-        "cost:chapter": "data"
-        "cost:squad": "product"
-        "cost:project": "nfh-event-tracker"
+
     layers:
-        # The storage layer
         - layer: storage
+
         - layer: firehose-rsc
+          layer_type: firehose-resource
+
         - layer: firehose
+          layer_type: firehose
           secrets_namespace: "humilis:firehose:redshift"
           streams:
               - name: DeliveryStream1
