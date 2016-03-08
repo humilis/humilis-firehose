@@ -23,12 +23,19 @@ clean:
 
 # deploy the test environment
 create: develop
-	$(HUMILIS) create --stage $(STAGE) $(HUMILIS_ENV).yaml
+	$(HUMILIS) create \
+		--stage $(STAGE) \
+		--output $(HUMILIS_ENV)-$(STAGE).outputs.yaml \
+		$(HUMILIS_ENV).yaml
 
 # update the test deployment
 update: develop
-	$(HUMILIS) update --stage $(STAGE) $(HUMILIS_ENV).yaml
+	$(HUMILIS) update \
+		--stage $(STAGE) \
+		--output $(HUMILIS_ENV)-$(STAGE).outputs.yaml \
+		$(HUMILIS_ENV).yaml
 
 # delete the test deployment
 delete: develop
+	$(PYTHON) scripts/empty-bucket.py $(HUMILIS_ENV)-$(STAGE).outputs.yaml
 	$(HUMILIS) delete --stage $(STAGE) $(HUMILIS_ENV).yaml
