@@ -14,7 +14,7 @@ develop: .env
 	.env/bin/pip install -r requirements-dev.txt
 
 # run unit tests
-test: .env
+test: develop
 	$(TOX)
 
 # remove .tox and .env dirs

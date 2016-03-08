@@ -28,8 +28,9 @@ def empty_bucket(humilis_outputs, stage="test"):
         outputs = yaml.load(f.read())
 
     bucket = outputs[LAYER_NAME]["BucketName"]
-    subprocess.run(["aws", "s3", "rm", "s3://{}/".format(bucket),
-                    "--recursive"], check=False, stdout=subprocess.PIPE)
+    subprocess.call([
+        "aws", "s3", "rm", "s3://{}/".format(bucket),
+        "--recursive"], stdout=subprocess.PIPE)
 
 if __name__ == "__main__":
     empty_bucket(*sys.argv[1:])
