@@ -19,6 +19,8 @@ except(IOError, ImportError, RuntimeError):
 setup(
     name=metadata.project,
     include_package_data=True,
+    package_data={
+        "": ["*.j2", "*.yaml"]},
     packages=find_packages(),
     version=metadata.version,
     author=metadata.authors_string,

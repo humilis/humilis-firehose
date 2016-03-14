@@ -1,1 +1,0 @@
-recursive-include humilis_firehose *.j2 *.yaml

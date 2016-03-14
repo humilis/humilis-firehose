@@ -1,14 +1,28 @@
 Firehose delivery layer for humilis
 ===================================
 
+[![PyPI](https://img.shields.io/pypi/v/humilis-firehose.svg?style=flat)](https://pypi.python.org/pypi/humilis-firehose)
+
 A [humilis][humilis] plug-in layer that deploys one ore more 
-[Firehose delivery streams][firehose] to deliver events to S3.
+[Firehose delivery streams][firehose] to deliver events to [S3][s3] and 
+[Redshift][redshift].
 
 [firehose]: http://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html
 [humilis]: https://github.com/InnovativeTravel/humilis
+[redshift]: https://aws.amazon.com/documentation/redshift/
+[s3]: https://aws.amazon.com/documentation/s3/
 
 
 ## Installation
+
+To install the latest stable release:
+
+```
+pip install humilis-firehose
+```
+
+
+Install the development version:
 
 ```
 pip install git+https://github.com/InnovativeTravel/humilis-firehose
