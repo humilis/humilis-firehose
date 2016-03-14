@@ -16,7 +16,7 @@ meta:
                 ref:
                     parser: output
                     parameters:
-                        layer_name: {{firehose_rsc_layer or "firehose-rsc"}}
+                        layer_name: {{firehose_resource_layer or "firehose-resource"}}
                         output_name: CustomResourceFunctionArn
         s3_delivery:
             description:

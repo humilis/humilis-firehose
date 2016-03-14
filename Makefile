@@ -14,8 +14,9 @@ develop: .env
 	.env/bin/pip install -r requirements-dev.txt
 
 # run unit tests
-test: develop
+test: create
 	$(TOX)
+	echo "Don't forget to run 'make delete' when you are done!"
 
 # remove .tox and .env dirs
 clean:

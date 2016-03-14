@@ -6,11 +6,12 @@ firehose:
     layers:
         - layer: storage
 
-        - layer: firehose-rsc
+        - layer: firehose-resource
           layer_type: firehose-resource
 
         - layer: firehose
           layer_type: firehose
+          firehose_resource_layer: firehose-resource
           secrets_namespace: "humilis:firehose:redshift"
           streams:
               - name: DeliveryStream1
