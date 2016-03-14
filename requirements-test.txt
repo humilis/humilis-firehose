@@ -6,3 +6,7 @@ mock
 tox
 git+https://github.com/Innovativetravel/humilis
 git+https://github.com/Innovativetravel/humilis-firehose-resource
+
+# We also need to install this layer in order to test it
+-e .
+

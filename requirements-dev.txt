@@ -3,9 +3,6 @@ ipython
 ipdb
 pdbpp
 
-# We also need to install this layer in order to test it
--e .
-
 # We need the AWS CLI in order to delete the bucket contents
 awscli
 
