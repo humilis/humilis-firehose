@@ -3,7 +3,7 @@
 
 package = "humilis-firehose"
 project = "humilis-firehose"
-version = '0.0.6'
+version = '0.0.7'
 description = ("A humilis plug-in that deploys Firehose delivery streams "
                "Cloudformation")
 authors = ["German Gomez-Herrero"]
