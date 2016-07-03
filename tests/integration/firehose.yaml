@@ -13,7 +13,7 @@ firehose:
           layer_type: firehose
           firehose_resource_layer: firehose-resource
           redshift_delivery: True
-          keyring_group: "humilis:firehose:redshift"
+          keyring_group: "humilis/firehose/redshift"
           streams:
               - name: DeliveryStream1
                 prefix: str1/
