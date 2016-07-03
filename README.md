@@ -2,6 +2,7 @@ Humilis plug-in to deploy Firehose delivery streams
 ===================================================
 
 [![PyPI](https://img.shields.io/pypi/v/humilis-firehose.svg?style=flat)](https://pypi.python.org/pypi/humilis-firehose)
+[![Build Status](https://travis-ci.org/humilis/humilis-firehose.svg?branch=master)](https://travis-ci.org/humilis/humilis-firehose)
 
 A [humilis][humilis] plug-in layer that deploys
 [Firehose delivery streams][firehose].
