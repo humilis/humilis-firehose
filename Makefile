@@ -11,7 +11,7 @@ HUMILIS_ENV := tests/integration/firehose
 
 # install dev dependencies, create layers directory
 develop: .env
-	.env/bin/pip install -r requirements-dev.txt
+	.env/bin/pip install -r requirements-test.txt
 
 # run integration tests
 test: .env
