@@ -4,7 +4,7 @@ resources:
     {{stream.name}}:
       Type: 'Custom::Firehose'
       Properties:
-        ServiceToken: {{firehose_resource_function_arn}}
+        ServiceToken: "{{firehose_resource_function_arn}}"
         S3DestinationConfiguration:
           RoleARN:
             "Fn::GetAtt":
@@ -13,21 +13,22 @@ resources:
           BucketARN:
             "Fn::Join":
               - ""
-              - ["arn:aws:s3:::", "{{s3_delivery.bucket_name}}"]
-          Prefix: {{_env.name}}/{{_layer.name}}/{{stream.prefix}}
+              - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
+          Prefix: "{{_env.name}}/{{_layer.name}}/{{stream.prefix}}"
           BufferingHints:
-            SizeInMBs: {{s3_delivery.buffer_mbs}}
-            IntervalInSeconds: {{s3_delivery.buffer_seconds}}
-          CompressionFormat: {{s3_delivery.compression}}
+            SizeInMBs: "{{s3_buffer_mbs}}"
+            IntervalInSeconds: "{{s3_buffer_seconds}}"
+          CompressionFormat: "{{s3_compression}}"
         {% if redshift_delivery %}
         RedshiftDestinationConfiguration:
-          ClusterJDBCURL: {{cluster_jdbc_url}}
+          ClusterJDBCURL: "jdbc:redshift://{{redshift_host}}:{{redshift_port}}/{{redshift_database}}"
           CopyCommand:
-            DataTableName: {{stream.table}}
-            CopyOptions: {{redshift_delivery.copy_options}}
-          Username: {{redshift_username}}
-          Password: {{redshift_password}}
+            DataTableName: "{{stream.table}}"
+            CopyOptions: "{{redshift_copy_options}}"
+          Username: "{{redshift_username}}"
+          Password: "{{redshift_password}}"
         {% endif %}
+
     DeliveryStreamRole:
       Type: 'AWS::IAM::Role'
       Properties:
@@ -51,7 +52,7 @@ resources:
                   Resource:
                     "Fn::Join":
                       - ""
-                      - ["arn:aws:s3:::", "{{s3_delivery.bucket_name}}"]
+                      - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
                 - Effect: Allow
                   Action:
                     - "s3:GetObject"
@@ -59,5 +60,5 @@ resources:
                   Resource:
                     "Fn::Join":
                       - ""
-                      - ["arn:aws:s3:::", "{{s3_delivery.bucket_name}}/{{_env.name}}/{{_layer.name}}/*"]
+                      - ["arn:aws:s3:::", "{{s3_bucket_name}}/{{_env.name}}/{{_layer.name}}/*"]
     {% endfor %}

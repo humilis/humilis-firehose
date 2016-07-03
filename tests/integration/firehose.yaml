@@ -12,7 +12,8 @@ firehose:
         - layer: firehose
           layer_type: firehose
           firehose_resource_layer: firehose-resource
-          secrets_namespace: "humilis:firehose:redshift"
+          redshift_delivery: True
+          keyring_group: "humilis:firehose:redshift"
           streams:
               - name: DeliveryStream1
                 prefix: str1/

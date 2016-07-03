@@ -1,0 +1,3 @@
+include *.rst
+include humilis_firehose/*.j2
+include humilis_firehose/*.yaml

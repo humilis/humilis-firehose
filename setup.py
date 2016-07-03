@@ -1,33 +1,36 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Setuptools entry point."""
 
 import os
+import codecs
 from setuptools import setup, find_packages
 
-import humilis_firehose.metadata as metadata
+from humilis_firehose import __version__, __author__
 
+dirname = os.path.dirname(__file__)
+description = "Humilis plug-in to create Firehose delivery streams"
 
 try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
 except(IOError, ImportError, RuntimeError):
     if os.path.isfile("README.md"):
-        long_description = open("README.md").read()
+        long_description = codecs.open(os.path.join(dirname, "README.md"),
+                                       encoding="utf-8").read()
     else:
-        long_description = metadata.description
+        long_description = description
 
 setup(
-    name=metadata.project,
+    name="humilis-firehose",
     include_package_data=True,
     package_data={
         "": ["*.j2", "*.yaml"]},
-    packages=find_packages(),
-    version=metadata.version,
-    author=metadata.authors_string,
-    author_email=metadata.emails[0],
-    url=metadata.url,
-    license=metadata.license,
-    description=metadata.description,
+    packages=find_packages(include=["humilis_firehose"]),
+    version=__version__,
+    author=__author__,
+    author_email="german@findhotel.net",
+    url="https://github.com/humilis/humilis-firehose",
+    license="MIT",
+    description=description,
     long_description=long_description,
     install_requires=[
         "humilis>=0.3.0"],
@@ -36,5 +39,5 @@ setup(
     zip_safe=False,
     entry_points={
         "humilis.layers": [
-            "firehose=humilis_firehose.__init__:get_layer_path"]}
+            "firehose=humilis_firehose.plugin:get_layer_path"]}
 )

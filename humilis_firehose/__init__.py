@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
+"""Humilis plug-in to deploy Firehose delivery streams."""
 
 
-import inspect
-import os
-
-
-def get_layer_path():
-    return os.path.dirname(inspect.getfile(inspect.currentframe()))
+__version__ = "0.0.8"
+__author__ = "German Gomez-Herrero, FindHotel BV"

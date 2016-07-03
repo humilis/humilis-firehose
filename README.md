@@ -1,11 +1,10 @@
-Firehose delivery layer for humilis
-===================================
+Humilis plug-in to deploy Firehose delivery streams
+===================================================
 
 [![PyPI](https://img.shields.io/pypi/v/humilis-firehose.svg?style=flat)](https://pypi.python.org/pypi/humilis-firehose)
 
-A [humilis][humilis] plug-in layer that deploys one ore more 
-[Firehose delivery streams][firehose] to deliver events to [S3][s3] and 
-[Redshift][redshift].
+A [humilis][humilis] plug-in layer that deploys
+[Firehose delivery streams][firehose].
 
 [firehose]: http://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html
 [humilis]: https://github.com/InnovativeTravel/humilis
@@ -15,17 +14,16 @@ A [humilis][humilis] plug-in layer that deploys one ore more
 
 ## Installation
 
-To install the latest stable release:
 
 ```
 pip install humilis-firehose
 ```
 
 
-Install the development version:
+To install the development version:
 
 ```
-pip install git+https://github.com/InnovativeTravel/humilis-firehose
+pip install git+https://github.com/humilis/humilis-firehose
 ```
 
 
@@ -42,13 +40,13 @@ make develop
 Configure humilis:
 
 ```
-.env/bin/humilis configure --local
+make configure
 ```
 
 
 ## Testing
 
-There is no logic in this layer beyond the deployment of AWS resources so 
+There is no logic in this layer beyond the deployment of AWS resources so
 there is no unit test suite. You can test the deployment of the Firehose
 delivery streams with:
 
@@ -73,9 +71,28 @@ make delete
 
 See [humilis][humilis] documentation.
 
-[humilis]: https://github.com/InnovativeTravel/humilis/blob/master/README.md
+[humilis]: https://github.com//humilis/blob/master/README.md
 
 
-## Who do I ask?
+## Contact
 
-Ask [German](mailto:german@innovativetravel.eu).
+If you have questions, bug reports, suggestions, etc. please create an issue on
+the [GitHub project page][github].
+
+[github]: http://github.com/humilis/humilis-firehose
+
+
+## License
+
+This software is licensed under the [MIT license][mit].
+
+[mit]: http://en.wikipedia.org/wiki/MIT_License
+
+See [License file][LICENSE].
+
+[LICENSE]: https://github.com/humilis/humilis-firehose/blob/master/LICENSE.txt
+
+
+© 2016 German Gomez-Herrero, [Find Hotel][fh] and others.
+
+[fh]: http://company.findhotel.net

@@ -22,6 +22,10 @@ test: create
 clean:
 	rm -rf .env .tox
 
+# configure humilis
+configure:
+	$(HUMILIS) configure --local
+
 # deploy the test environment
 create: develop
 	$(HUMILIS) create \

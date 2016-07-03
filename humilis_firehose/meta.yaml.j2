@@ -1,13 +1,8 @@
 ---
 meta:
     description:
-        Creates Firehose delivery streams that deliver records to S3/Redshift
-    {% if dependencies %}
-    dependencies:
-        {% for dep in dependencies %}
-        - dep
-        {% endfor %}
-    {% endif %}
+        Creates Firehose delivery streams
+
     parameters:
         firehose_resource_function_arn:
             description:
@@ -18,48 +13,97 @@ meta:
                     parameters:
                         layer_name: {{firehose_resource_layer or "firehose-resource"}}
                         output_name: CustomResourceFunctionArn
-        s3_delivery:
+
+        s3_bucket_name:
             description:
-                Common settings for all delivery stream(s)
+                Name of the target S3 bucket
             value:
-                bucket_name:
-                    ref:
-                        parser: output
-                        parameters:
-                            layer_name: {{storage_layer or "storage"}}
-                            output_name: BucketName
-                buffer_mbs: 1
-                buffer_seconds: 60
-                compression: GZIP
+                # Assume the target bucket is in a layer called "storage" with
+                # an output called "BucketName"
+                ref:
+                    parser: output
+                    parameters:
+                        layer_name: {{storage_layer or "storage"}}
+                        output_name: BucketName
+
+        s3_buffer_mbs:
+            description:
+                The amount of buffering in MBs
+            value:
+                # Minimum: 1, Maximum: 128
+                128
+
+        s3_buffer_seconds:
+            description:
+                The ammount of buffering in seconds
+            value:
+                # Minimum: 60, Maximum: 900
+                900
+
+        s3_compression:
+            description:
+                The compression type
+            value:
+               # Values: UNCOMPRESSED, GZIP, ZIP, Snappy 
+                GZIP
+
         redshift_delivery:
             description:
-                Common Redshift delivery settings for all streams
+                If set to True, activate delivery to Redshift
             value:
-                copy_options: EMPTYASNULL CSV GZIP
-        cluster_jdbc_url:
-            description: The JDBC URL of the cluster
+                False
+
+        redshift_copy_options:
+            description:
+                Options for Redshift copy command
+            value:
+                EMPTYASNULL CSV GZIP
+
+        redshift_host:
+            description: The hostname or IP address of the Redshift endpoint
             value:
                 ref:
                     parser: secret
                     parameters:
-                        service: "{{secrets_namespace}}"
-                        key: jdbc_url
+                        service: "{{keyring_group}}"
+                        key: host
+
+        redshift_port:
+            description: The port of the Redshift endpoint
+            value:
+                ref:
+                    parser: secret
+                    parameters:
+                        service: "{{keyring_group}}"
+                        key: port
+
+        redshift_database:
+            description: The name of the Redshift database
+            value:
+                ref:
+                    parser: secret
+                    parameters:
+                        service: "{{keyring_group}}"
+                        key: database
+
         redshift_username:
             description: Redshift username
             value:
                 ref:
                     parser: secret
                     parameters:
-                        service: "{{secrets_namespace}}"
+                        service: "{{keyring_group}}"
                         key: username
+
         redshift_password:
             description: Redshift password
             value:
                 ref:
                     parser: secret
                     parameters:
-                        service: "{{secrets_namespace}}"
+                        service: "{{keyring_group}}"
                         key: password
+
         streams:
             description:
                 The names of the streams and the associated S3 prefixes and, 
