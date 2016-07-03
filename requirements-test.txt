@@ -1,6 +1,5 @@
 # test requirements
 boto3
-keyring
 pytest
 mock
 tox
