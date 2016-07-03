@@ -3,9 +3,10 @@ boto3
 pytest
 mock
 tox
-git+https://github.com/humilis/humilis
-git+https://github.com/humilis/humilis-firehose-resource
 
 # We also need to install this layer in order to test it
 -e .
 
+# Supporting humilis plugins
+git+https://github.com/humilis/humilis
+git+https://github.com/humilis/humilis-firehose-resource

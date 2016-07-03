@@ -1,12 +1,14 @@
-"""Global conftest."""
+"""Fixtures for the integration tests suite."""
+
 import pytest
-from collections import namedtuple
+
+from humilis.environment import Environment
 
 
-@pytest.fixture(scope="session")
-def settings():
-    """Global test settings."""
-    Settings = namedtuple('Settings', 'stage environment_path layer_name')
-    return Settings(stage="DEV",
-                    environment_path="tests/integration/firehose.yaml",
-                    layer_name="firehose")
+@pytest.yield_fixture(scope="module")
+def environment():
+    """Create (and delete) a sample environment."""
+    env = Environment("tests/integration/firehose.yaml")
+    env.create()
+    yield env
+    env.delete()

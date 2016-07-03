@@ -13,10 +13,10 @@ HUMILIS_ENV := tests/integration/firehose
 develop: .env
 	.env/bin/pip install -r requirements-dev.txt
 
-# run unit tests
-test: create
+# run integration tests
+test: .env
+	$(PIP) install tox
 	$(TOX)
-	echo "Don't forget to run 'make delete' when you are done!"
 
 # remove .tox and .env dirs
 clean:
