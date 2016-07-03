@@ -42,7 +42,6 @@ update: develop
 
 # delete the test deployment
 delete: develop
-	$(PYTHON) scripts/empty-bucket.py $(HUMILIS_ENV)-$(STAGE).outputs.yaml
 	$(HUMILIS) delete --stage $(STAGE) $(HUMILIS_ENV).yaml
 
 # upload to Pypi
