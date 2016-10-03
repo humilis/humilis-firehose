@@ -10,7 +10,13 @@ outputs:
         Description:
             The Arn of delivery stream '{{stream.name}}'.
         Value:
-            "Fn::GetAtt":
-              - {{stream.name}}
-              - Arn
+            "Fn::Join":
+              - ""
+              - ["arn:aws:firehose:",
+                {"Ref": "AWS::Region"},
+                ":",
+                {"Ref": "AWS::AccountId"},
+                ":",
+                "deliverystream/",
+                {"Ref": {{stream.name}}}]
     {% endfor %}

@@ -1,22 +1,29 @@
 ---
+# Layer meta-parameters:
+#
+# * keyring_group: if provided the Redshift host, port, username, and password
+#   will be obtained from the provided S3 keyring group (by reading the keys
+#   host, port, username, and password).
+#
+# Conventions used by this layer:
+#
+# * If the s3_bucket_name parameter is not provided, the bucket name will be 
+#   taken from output BucketName from a layer named storage within the current
+#   humilis environment.
 meta:
     description:
-        Creates Firehose delivery streams
+        Firehose delivery streams
 
     parameters:
-        firehose_resource_function_arn:
+        logging:
             description:
-                The ARN of the Lambda function that backs the custom Firehose resource
+                Should logging be activated (yes or no)
             value:
-                ref:
-                    parser: output
-                    parameters:
-                        layer_name: {{firehose_resource_layer or "firehose-resource"}}
-                        output_name: CustomResourceFunctionArn
-
+                yes
+        # S3 configuration options
         s3_bucket_name:
             description:
-                Name of the target S3 bucket
+                Name of the target S3 bucket.
             value:
                 # Assume the target bucket is in a layer called "storage" with
                 # an output called "BucketName"
@@ -28,30 +35,76 @@ meta:
 
         s3_buffer_mbs:
             description:
-                The amount of buffering in MBs
+                The amount of buffering in MBs.
             value:
                 # Minimum: 1, Maximum: 128
                 128
 
         s3_buffer_seconds:
             description:
-                The ammount of buffering in seconds
+                The ammount of buffering in seconds.
             value:
                 # Minimum: 60, Maximum: 900
                 900
 
         s3_compression:
             description:
-                The compression type
+                The compression type.
             value:
                # Values: UNCOMPRESSED, GZIP, ZIP, Snappy 
                 GZIP
 
-        redshift_delivery:
+
+        # Elastic search delivery options
+        es_s3_backup_mode:
             description:
-                If set to True, activate delivery to Redshift
+                Defines how documents should be delivered to Amazon S3
             value:
-                False
+                FailedDocumentsOnly
+
+        es_buffer_mbs:
+            description:
+                The amount of buffering in MBs.
+            value:
+                # Minimum: 1, Maximum: 100
+                5
+
+        es_buffer_seconds:
+            description:
+                The ammount of buffering in seconds.
+            value:
+                # Minimum: 60, Maximum: 900
+                900
+
+        es_domain_name:
+            description:
+                The ES domain name
+            value:
+                {{_env.name}}-{{_env.stage}}
+
+        es_domain_arn:
+            description:
+                Overrides es_domain_name
+            value:
+
+        es_index_name:
+            description:
+                The name of the target index.
+            value:
+                {{_layer.name}}
+
+        es_index_rotation_period:
+            description:
+                The frequency of ES index rotation.
+            value:
+                NoRotation
+
+        es_retry_seconds:
+            description:
+                The amount of time Firehose will keep retrying to deliver
+                records to ES.
+            value:
+                7200
 
         redshift_copy_options:
             description:
@@ -62,38 +115,46 @@ meta:
         redshift_host:
             description: The hostname or IP address of the Redshift endpoint
             value:
+                {% if keyring_group %}
                 ref:
                     parser: secret
                     parameters:
                         service: "{{keyring_group}}"
                         key: host
+                {% endif %}
 
         redshift_port:
             description: The port of the Redshift endpoint
             value:
+                {% if keyring_group %}
                 ref:
                     parser: secret
                     parameters:
                         service: "{{keyring_group}}"
                         key: port
+                {% endif %}
 
         redshift_database:
             description: The name of the Redshift database
             value:
+                {% if keyring_group %}
                 ref:
                     parser: secret
                     parameters:
                         service: "{{keyring_group}}"
                         key: database
+                {% endif %}
 
         redshift_username:
             description: Redshift username
             value:
+                {% if keyring_group %}
                 ref:
                     parser: secret
                     parameters:
                         service: "{{keyring_group}}"
                         key: username
+                {% endif %}
 
         redshift_password:
             description: Redshift password
@@ -109,6 +170,3 @@ meta:
                 The names of the streams and the associated S3 prefixes and, 
                 optionally, Redshift tables.
             value:
-                - name: DeliveryStream
-                  prefix: stream/
-                  table: "_test.stream"

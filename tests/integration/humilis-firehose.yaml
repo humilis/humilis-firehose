@@ -1,0 +1,35 @@
+---
+humilis-firehose:
+    description:
+        A dummy environment used for testing the firehose layer.
+
+    layers:
+        # Creates a S3 bucket to test S3 delivery
+        - layer: storage
+
+        - layer: es
+          layer_type: es
+          whitelisted_ips:
+            - "24.132.203.21/32"
+          domain_name: dummy
+
+        - layer: delivery
+          layer_type: firehose
+          keyring_group:  humilis/firehose/redshift
+          s3_buffer_seconds: 60
+          s3_compression: UNCOMPRESSED
+          es_buffer_seconds: 60
+          es_retry_seconds: 60
+          es_domain_name:
+            ref:
+              parser: output
+              parameters:
+                layer_name: es
+                output_name: EsDomain
+          streams:
+              - name: DeliveryStream1
+                s3_prefix: stream1/
+              - name: DeliveryStream2
+                s3_prefix: stream2/
+                es_type:
+                  dummytype

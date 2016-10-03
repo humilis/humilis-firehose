@@ -3,7 +3,7 @@ PIP := .env/bin/pip
 PYTHON := .env/bin/python
 TOX := .env/bin/tox
 STAGE := DEV
-HUMILIS_ENV := tests/integration/firehose
+HUMILIS_ENV := tests/integration/humilis-firehose
 
 # create virtual environment
 .env:
@@ -42,6 +42,7 @@ update: develop
 
 # delete the test deployment
 delete: develop
+	./scripts/empty-bucket.py $(HUMILIS_ENV)-$(STAGE).outputs.yaml
 	$(HUMILIS) delete --stage $(STAGE) $(HUMILIS_ENV).yaml
 
 # upload to Pypi

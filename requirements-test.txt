@@ -4,9 +4,10 @@ pytest
 mock
 tox
 
-# We also need to install this layer in order to test it
 -e .
-
-# Supporting humilis plugins
 git+https://github.com/humilis/humilis
-git+https://github.com/humilis/humilis-firehose-resource
+git+https://github.com/humilis/humilis-streams
+git+https://github.com/humilis/humilis-kinesis-processor
+git+https://github.com/humilis/humilis-es
+git+https://github.com/humilis/humilis-secrets-vault
+git+https://github.com/humilis/humilis-lambdautils

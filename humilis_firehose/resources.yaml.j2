@@ -1,34 +1,143 @@
 ---
 resources:
+    {% if logging %}
+    LogGroup:
+      Type: "AWS::Logs::LogGroup"
+      Properties: 
+        LogGroupName: {{_env.name}}-{{_env.stage}}
+        RetentionInDays: 7
+    {% endif %}
     {% for stream in streams %}
-    {{stream.name}}:
-      Type: 'Custom::Firehose'
+    {% if logging %}
+    LogStream{{stream.name}}:
+      Type: "AWS::Logs::LogStream"
       Properties:
-        ServiceToken: "{{firehose_resource_function_arn}}"
+        LogGroupName: {"Ref": "LogGroup"}
+        LogStreamName: {{_layer.name}}-{{stream.name}}
+    {% endif %}
+    {{stream.name}}:
+      Type: 'AWS::KinesisFirehose::DeliveryStream'
+      Properties:
+        DeliveryStreamName: {{_env.name}}-{{_env.stage}}-{{_layer.name}}-{{stream.name}}
+        {% if stream.s3_prefix and not stream.redshift_table and not stream.es_type %}
+        # If Redshift delivery is active then there is no need for an
+        # additional S3 delivery configuration.
         S3DestinationConfiguration:
-          RoleARN:
-            "Fn::GetAtt":
-              - DeliveryStreamRole
-              - Arn
           BucketARN:
             "Fn::Join":
               - ""
               - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
-          Prefix: "{{_env.name}}/{{_layer.name}}/{{stream.prefix}}"
           BufferingHints:
-            SizeInMBs: "{{s3_buffer_mbs}}"
-            IntervalInSeconds: "{{s3_buffer_seconds}}"
+            SizeInMBs: {{s3_buffer_mbs}}
+            IntervalInSeconds: {{s3_buffer_seconds}}
+          {% if logging %}
+          CloudWatchLoggingOptions:
+            Enabled: True
+            LogGroupName: {"Ref": "LogGroup"}
+            LogStreamName: {"Ref": "LogStream{{stream.name}}"}
+          {% endif %}
           CompressionFormat: "{{s3_compression}}"
-        {% if redshift_delivery %}
+          Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
+          RoleARN:
+            "Fn::GetAtt":
+              - DeliveryStreamRole
+              - Arn
+        {% endif %}
+        {% if stream.redshift_table %}
         RedshiftDestinationConfiguration:
+          S3Configuration:
+            BucketARN:
+              "Fn::Join":
+                - ""
+                - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
+            BufferingHints:
+              SizeInMBs: {{s3_buffer_mbs}}
+              IntervalInSeconds: {{s3_buffer_seconds}}
+            {% if logging %}
+            CloudWatchLoggingOptions:
+              Enabled: True
+              LogGroupName: {"Ref": "LogGroup"}
+              LogStreamName: {"Ref": "LogStream{{stream.name}}"}
+            {% endif %}
+            CompressionFormat: "{{s3_compression}}"
+            Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
+            RoleARN:
+              "Fn::GetAtt":
+                - DeliveryStreamRole
+                - Arn
+          {% if logging %}
+          CloudWatchLoggingOptions:
+            Enabled: True
+            LogGroupName: {"Ref": "LogGroup"}
+            LogStreamName: {"Ref": "LogStream{{stream.name}}"}
+          {% endif %}
           ClusterJDBCURL: "jdbc:redshift://{{redshift_host}}:{{redshift_port}}/{{redshift_database}}"
           CopyCommand:
-            DataTableName: "{{stream.table}}"
+            DataTableName: "{{stream.redshift_table}}"
             CopyOptions: "{{redshift_copy_options}}"
           Username: "{{redshift_username}}"
           Password: "{{redshift_password}}"
+          RoleARN:
+            "Fn::GetAtt":
+              - DeliveryStreamRole
+              - Arn
         {% endif %}
-
+        {% if stream.es_type %}
+        ElasticsearchDestinationConfiguration:
+          S3BackupMode:
+            {{es_s3_backup_mode}}
+          S3Configuration:
+            BucketARN:
+              "Fn::Join":
+                - ""
+                - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
+            BufferingHints:
+              SizeInMBs: {{s3_buffer_mbs}}
+              IntervalInSeconds: {{s3_buffer_seconds}}
+            {% if logging %}
+            CloudWatchLoggingOptions:
+              Enabled: True
+              LogGroupName: {"Ref": "LogGroup"}
+              LogStreamName: {"Ref": "LogStream{{stream.name}}"}
+            {% endif %}
+            CompressionFormat: "{{s3_compression}}"
+            Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
+            RoleARN:
+              "Fn::GetAtt":
+                - DeliveryStreamRole
+                - Arn
+          BufferingHints:
+            IntervalInSeconds: {{es_buffer_seconds}}
+            SizeInMBs: {{es_buffer_mbs}}
+          {% if logging %}
+          CloudWatchLoggingOptions:
+            Enabled: True
+            LogGroupName: {"Ref": "LogGroup"}
+            LogStreamName: {"Ref": "LogStream{{stream.name}}"}
+          {% endif %}
+          DomainARN:
+            {% if es_domain_arn %}
+            {{es_domain_arn}}
+            {% else %}
+            "Fn::Join":
+              - ""
+              - ["arn:aws:es:", {"Ref": "AWS::Region"},":",
+                 {"Ref": "AWS::AccountId"}, ":", "domain/", "{{es_domain_name}}"]
+            {% endif %}
+          IndexName:
+            {{es_index_name}}
+          IndexRotationPeriod:
+            {{es_index_rotation_period}}
+          RetryOptions:
+            DurationInSeconds:
+                {{es_retry_seconds}}
+          RoleARN:
+            "Fn::GetAtt":
+              - DeliveryStreamRole
+              - Arn
+          TypeName:
+            {{stream.es_type}}
+        {% endif %}
     DeliveryStreamRole:
       Type: 'AWS::IAM::Role'
       Properties:
@@ -36,9 +145,13 @@ resources:
           Version: '2012-10-17'
           Statement:
             - Effect: Allow
+              Sid: ""
               Principal:
                   Service: 'firehose.amazonaws.com'
               Action: 'sts:AssumeRole'
+              Condition:
+                StringEquals:
+                  "sts:ExternalId": {"Ref": "AWS::AccountId"}
         {# Keep all environment roles under the same path #}
         Path: {{ "/{}/".format(_env.name) }}
         Policies:
@@ -46,19 +159,75 @@ resources:
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
-                - Effect: Allow
+                - Effect: "Allow"
+                  Sid: ""
                   Action:
-                    - "s3:ListBucket"
+                    - "logs:PutLogEvents"
                   Resource:
-                    "Fn::Join":
+                    - "Fn::Join":
+                      - ""
+                      - ["arn:aws:logs:", {"Ref": "AWS::Region"},":",
+                         {"Ref": "AWS::AccountId"}, ":log-group:",
+                         {"Ref": "LogGroup"}, ":log-stream:",
+                         {"Ref": "LogStream{{stream.name}}"}]
+                - Effect: Allow
+                  Sid: ""
+                  Action:
+                    - "s3:AbortMultipartUpload"
+                    - "s3:GetBucketLocation"
+                    - "s3:GetObject"
+                    - "s3:ListBucket"
+                    - "s3:ListBucketMultipartUploads"
+                    - "s3:PutObject"
+                  Resource:
+                    - "Fn::Join":
+                      - ""
+                      - ["arn:aws:s3:::", "{{s3_bucket_name}}/*"]
+                    - "Fn::Join":
                       - ""
                       - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
                 - Effect: Allow
+                  Sid: ""
                   Action:
-                    - "s3:GetObject"
-                    - "s3:PutObject"
+                    - "es:DescribeElasticsearchDomain"
+                    - "es:DescribeElasticsearchDomains"
+                    - "es:DescribeElasticsearchDomainConfig"
+                    - "es:ESHttpPost"
+                    - "es:ESHttpPut"
                   Resource:
-                    "Fn::Join":
+                    - "Fn::Join":
                       - ""
-                      - ["arn:aws:s3:::", "{{s3_bucket_name}}/{{_env.name}}/{{_layer.name}}/*"]
+                      - ["arn:aws:es:", {"Ref": "AWS::Region"},":",
+                         {"Ref": "AWS::AccountId"}, ":", "{{es_domain_name}}"]
+                    - "Fn::Join":
+                      - ""
+                      - ["arn:aws:es:", {"Ref": "AWS::Region"},":",
+                         {"Ref": "AWS::AccountId"}, ":", "{{es_domain_name}}/*"]
+                - Effect: Allow
+                  Sid: ""
+                  Action:
+                    - "es:*"
+                  Resource: "*"
+                - Effect: Allow
+                  Sid: ""
+                  Action:
+                    - "es:ESHttpGet"
+                  Resource:
+                    {% for endpoint in ['_all/_settings', '_cluster/stats', '_nodes', '_nodes/stats', '_nodes/*/stats', '_stats'] %}
+                    - "Fn::Join":
+                      - ""
+                      - ["arn:aws:es:", {"Ref": "AWS::Region"},":",
+                         {"Ref": "AWS::AccountId"}, ":", "{{es_domain_name}}/",
+                         "{{endpoint}}"]
+                    {% endfor %}
+                    - "Fn::Join":
+                      - ""
+                      - ["arn:aws:es:", {"Ref": "AWS::Region"},":",
+                         {"Ref": "AWS::AccountId"}, ":", "{{es_domain_name}}/",
+                         "{{es_index_name}}/_mapping/{{stream.es_type}}"]
+                    - "Fn::Join":
+                      - ""
+                      - ["arn:aws:es:", {"Ref": "AWS::Region"},":",
+                         {"Ref": "AWS::AccountId"}, ":", "{{es_domain_name}}/",
+                         "{{es_index_name}}/_stats"]
     {% endfor %}
