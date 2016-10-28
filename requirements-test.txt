@@ -1,6 +1,7 @@
 # test requirements
 boto3
 pytest
+pyyaml
 mock
 tox
 
