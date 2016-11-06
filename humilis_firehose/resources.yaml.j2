@@ -78,30 +78,30 @@ resources:
         {% if stream.es_type %}
         ElasticsearchDestinationConfiguration:
           S3BackupMode:
-            {{es_s3_backup_mode}}
+            {{stream.es_s3_backup_mode or es_s3_backup_mode}}
           S3Configuration:
             BucketARN:
               "Fn::Join":
                 - ""
                 - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
             BufferingHints:
-              SizeInMBs: {{s3_buffer_mbs}}
-              IntervalInSeconds: {{s3_buffer_seconds}}
+              SizeInMBs: {{stream.s3_buffer_mbs or s3_buffer_mbs}}
+              IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
             {% if log_group %}
             CloudWatchLoggingOptions:
               Enabled: True
-              LogGroupName: {{log_group}}
+              LogGroupName: {{stream.log_group or log_group}}
               LogStreamName: {"Ref": "LogStream{{stream.name}}"}
             {% endif %}
-            CompressionFormat: "{{s3_compression}}"
+            CompressionFormat: "{{stream.s3_compression or s3_compression}}"
             Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
             RoleARN:
               "Fn::GetAtt":
                 - DeliveryStreamRole
                 - Arn
           BufferingHints:
-            IntervalInSeconds: {{es_buffer_seconds}}
-            SizeInMBs: {{es_buffer_mbs}}
+            IntervalInSeconds: {{stream.es_buffer_seconds or s3_buffer_seconds}}
+            SizeInMBs: {{stream.es_buffer_mbs or s3_buffer_mbs}}
           {% if log_group %}
           CloudWatchLoggingOptions:
             Enabled: True
@@ -118,12 +118,12 @@ resources:
                  {"Ref": "AWS::AccountId"}, ":", "domain/", "{{es_domain_name}}"]
             {% endif %}
           IndexName:
-            {{es_index_name}}
+            {{stream.es_index_name or es_index_name}}
           IndexRotationPeriod:
-            {{es_index_rotation_period}}
+            {{stream.es_index_rotation_period or es_index_rotation_period}}
           RetryOptions:
             DurationInSeconds:
-                {{es_retry_seconds}}
+                {{stream.es_retry_seconds or es_retry_seconds}}
           RoleARN:
             "Fn::GetAtt":
               - DeliveryStreamRole

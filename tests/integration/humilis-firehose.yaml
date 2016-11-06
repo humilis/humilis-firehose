@@ -26,6 +26,7 @@ humilis-firehose:
           s3_compression: UNCOMPRESSED
           es_buffer_seconds: 60
           es_retry_seconds: 60
+          es_index_name: default
           es_domain_name:
             ref:
               parser: output
@@ -36,4 +37,10 @@ humilis-firehose:
               - name: DeliveryStream2
                 s3_prefix: stream2/
                 es_type:
-                  dummytype
+                  stream2type
+              - name: DeliveryStream3
+                s3_prefix: stream3/
+                es_index_name:
+                    stream3
+                es_type:
+                  stream3type
