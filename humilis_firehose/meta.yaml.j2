@@ -15,11 +15,11 @@ meta:
         Firehose delivery streams
 
     parameters:
-        logging:
+        log_group:
             description:
-                Should logging be activated (yes or no)
+                The name of the log group. If not provided, logging will be off.
             value:
-                yes
+
         # S3 configuration options
         s3_bucket_name:
             description:

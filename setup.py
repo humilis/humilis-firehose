@@ -33,7 +33,7 @@ setup(
     description=description,
     long_description=long_description,
     install_requires=[
-        "humilis>=0.3.0"],
+        "humilis>=0.9.3"],
     classifiers=[
         "Programming Language :: Python :: 3"],
     zip_safe=False,
