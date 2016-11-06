@@ -7,6 +7,8 @@ humilis-firehose:
         # Creates a S3 bucket to test S3 delivery
         - layer: storage
 
+        - layer: logging
+
         - layer: es
           layer_type: es
           whitelisted_ips:
@@ -14,6 +16,10 @@ humilis-firehose:
           domain_name: dummy
 
         - layer: delivery
+          log_group:
+              ref:
+                  parser: "output"
+                  parameters: {"layer_name": "logging", "output_name": "LogGroupName"}
           layer_type: firehose
           keyring_group:  humilis/firehose/redshift
           s3_buffer_seconds: 60
@@ -23,9 +29,7 @@ humilis-firehose:
           es_domain_name:
             ref:
               parser: output
-              parameters:
-                layer_name: es
-                output_name: EsDomain
+              parameters: {"layer_name": "es", "output_name": "EsDomain"}
           streams:
               - name: DeliveryStream1
                 s3_prefix: stream1/
