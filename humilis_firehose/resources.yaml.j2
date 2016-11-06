@@ -21,15 +21,15 @@ resources:
               - ""
               - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
           BufferingHints:
-            SizeInMBs: {{s3_buffer_mbs}}
-            IntervalInSeconds: {{s3_buffer_seconds}}
+            SizeInMBs: {{stream.s3_buffer_mbs or s3_buffer_mbs}}
+            IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
           {% if log_group %}
           CloudWatchLoggingOptions:
             Enabled: True
             LogGroupName: {{log_group}}
             LogStreamName: {"Ref": "LogStream{{stream.name}}"}
           {% endif %}
-          CompressionFormat: "{{s3_compression}}"
+          CompressionFormat: "{{stream.s3_compression or s3_compression}}"
           Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
           RoleARN:
             "Fn::GetAtt":
@@ -42,17 +42,17 @@ resources:
             BucketARN:
               "Fn::Join":
                 - ""
-                - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
+                - ["arn:aws:s3:::", "{{stream.s3_bucket_name or stream.s3_bucket_name}}"]
             BufferingHints:
               SizeInMBs: {{s3_buffer_mbs}}
-              IntervalInSeconds: {{s3_buffer_seconds}}
+              IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
             {% if log_group %}
             CloudWatchLoggingOptions:
               Enabled: True
               LogGroupName: {{log_group}}
               LogStreamName: {"Ref": "LogStream{{stream.name}}"}
             {% endif %}
-            CompressionFormat: "{{s3_compression}}"
+            CompressionFormat: "{{stream.s3_compression or s3_compression}}"
             Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
             RoleARN:
               "Fn::GetAtt":
@@ -83,10 +83,7 @@ resources:
             BucketARN:
               "Fn::Join":
                 - ""
-                - ["arn:aws:s3:::", "{{s3_bucket_name}}"]
-            BufferingHints:
-              SizeInMBs: {{stream.s3_buffer_mbs or s3_buffer_mbs}}
-              IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
+                - ["arn:aws:s3:::", "{{stream.s3_bucket_name or s3_bucket_name}}"]
             {% if log_group %}
             CloudWatchLoggingOptions:
               Enabled: True
@@ -100,7 +97,7 @@ resources:
                 - DeliveryStreamRole
                 - Arn
           BufferingHints:
-            IntervalInSeconds: {{stream.es_buffer_seconds or s3_buffer_seconds}}
+            IntervalInSeconds: {{stream.es_buffer_seconds or es_buffer_seconds}}
             SizeInMBs: {{stream.es_buffer_mbs or s3_buffer_mbs}}
           {% if log_group %}
           CloudWatchLoggingOptions:
