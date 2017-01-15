@@ -1,6 +1,86 @@
 ---
 resources:
+    {% if not sns_topic.startswith("arn:") %}
+    SnsTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        TopicName: {{sns_topic}}
+    {% endif %}
     {% for stream in streams %}
+    {% if stream.es_type %}
+    {{stream.name}}DeliveryToElasticSearchAlarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "{{stream.name}} failed to deliver to Elastic Search"
+        AlarmActions:
+          {% if not sns_topic.startswith("arn:") %}
+          - Ref:
+              SnsTopic
+          {% else %}
+          - {{sns_topic}}
+          {% endif %}
+        MetricName: DeliveryToElasticSearch.Success
+        Namespace: AWS/Firehose
+        Statistic: Minimum
+        Period: 600
+        EvaluationPeriods: 2
+        Threshold: 0.95
+        ComparisonOperator: LessThanThreshold
+        Dimensions:
+          - Name: DeliveryStreamName
+            Value:
+              Ref: {{stream.name}}
+    {% endif %}
+    {% if stream.redshift_table %}
+    # Alarm if DeliveryToRedshift.Success is less than 1 for 20 mins. This is
+    # a reasonable default because Firehose will retry every 5 mins for a
+    # maximum of 60 mins. So a period of 20 mins should involve at least 3
+    # failed attempts which deserves raising an alarm.
+    {{stream.name}}DeliveryToRedshiftAlarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "{{stream.name}} failed to deliver to Redshift"
+        AlarmActions:
+          {% if not sns_topic.startswith("arn:") %}
+          - Ref:
+              SnsTopic
+          {% else %}
+          - {{sns_topic}}
+          {% endif %}
+        MetricName: DeliveryToRedshift.Success
+        Namespace: AWS/Firehose
+        Statistic: Minimum
+        Period: 600
+        EvaluationPeriods: 2
+        Threshold: 1
+        ComparisonOperator: LessThanThreshold
+        Dimensions:
+          - Name: DeliveryStreamName
+            Value:
+              Ref: {{stream.name}}
+    {% endif %}
+    {{stream.name}}DeliveryToS3Alarm:
+      Type: "AWS::CloudWatch::Alarm"
+      Properties:
+        AlarmDescription: "{{stream.name}} failed to deliver to S3"
+        AlarmActions:
+          {% if not sns_topic.startswith("arn:") %}
+          - Ref:
+              SnsTopic
+          {% else %}
+          - {{sns_topic}}
+          {% endif %}
+        MetricName: DeliveryToS3.Success
+        Namespace: AWS/Firehose
+        Statistic: Minimum
+        Period: 300
+        EvaluationPeriods: 1
+        Threshold: 1
+        ComparisonOperator: LessThanThreshold
+        Dimensions:
+          - Name: DeliveryStreamName
+            Value:
+              Ref: {{stream.name}}
     {% if log_group %}
     LogStream{{stream.name}}:
       Type: "AWS::Logs::LogStream"
@@ -80,6 +160,9 @@ resources:
           S3BackupMode:
             {{stream.es_s3_backup_mode or es_s3_backup_mode}}
           S3Configuration:
+            BufferingHints:
+              SizeInMBs: {{stream.s3_buffer_mbs or s3_buffer_mbs}}
+              IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
             BucketARN:
               "Fn::Join":
                 - ""

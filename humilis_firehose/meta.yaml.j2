@@ -20,6 +20,14 @@ meta:
                 The name of the log group. If not provided, logging will be off.
             value:
 
+        sns_topic:
+            description:
+                The SNS topic where alarm notifications will be posted. This
+                can be either an ARN of an existing topic, or the name of a
+                topic to be created during the creation of this layer.
+            value:
+                {{_env.name}}-{{_env.stage}}-{{_layer.name}}
+
         # S3 configuration options
         s3_bucket_name:
             description:
@@ -74,7 +82,7 @@ meta:
                 The ammount of buffering in seconds.
             value:
                 # Minimum: 60, Maximum: 900
-                900
+                60
 
         es_domain_name:
             description:
