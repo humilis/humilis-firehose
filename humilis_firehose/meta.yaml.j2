@@ -33,13 +33,6 @@ meta:
             description:
                 Name of the target S3 bucket.
             value:
-                # Assume the target bucket is in a layer called "storage" with
-                # an output called "BucketName"
-                ref:
-                    parser: output
-                    parameters:
-                        layer_name: {{storage_layer or "storage"}}
-                        output_name: BucketName
 
         s3_buffer_mbs:
             description:

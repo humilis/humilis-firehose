@@ -24,6 +24,12 @@ humilis-firehose:
           keyring_group:  humilis/firehose/redshift
           s3_buffer_seconds: 60
           s3_compression: UNCOMPRESSED
+          s3_bucket_name:
+              ref:
+                  parser: output
+                  parameters:
+                      layer_name: storage
+                      output_name: BucketName
           es_buffer_seconds: 60
           es_retry_seconds: 60
           es_index_name: default
