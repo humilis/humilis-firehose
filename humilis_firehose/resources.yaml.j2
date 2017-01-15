@@ -122,7 +122,7 @@ resources:
             BucketARN:
               "Fn::Join":
                 - ""
-                - ["arn:aws:s3:::", "{{stream.s3_bucket_name or stream.s3_bucket_name}}"]
+                - ["arn:aws:s3:::", "{{stream.s3_bucket_name or s3_bucket_name}}"]
             BufferingHints:
               SizeInMBs: {{s3_buffer_mbs}}
               IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
