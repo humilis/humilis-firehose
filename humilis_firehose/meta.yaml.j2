@@ -160,11 +160,13 @@ meta:
         redshift_password:
             description: Redshift password
             value:
+                {% if keyring_group %}
                 ref:
                     parser: secret
                     parameters:
                         service: "{{keyring_group}}"
                         key: password
+                {% endif %}
 
         streams:
             description:
