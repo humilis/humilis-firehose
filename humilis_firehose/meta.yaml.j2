@@ -172,4 +172,6 @@ meta:
             description:
                 The names of the streams and the associated S3 prefixes and, 
                 optionally, Redshift tables.
-            value:
+            # For backwards compatibility. New environments should use
+            # delivery_streams
+            value: {{delivery_streams}}
