@@ -22,6 +22,8 @@ humilis-firehose:
                   parameters: {"layer_name": "logging", "output_name": "LogGroupName"}
           layer_type: firehose
           keyring_group:  humilis/firehose/redshift
+          alert_subscribers:
+            - "arnaud@findhotel.net"
           s3_buffer_seconds: 60
           s3_compression: UNCOMPRESSED
           s3_bucket_name:

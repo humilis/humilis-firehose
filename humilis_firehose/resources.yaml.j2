@@ -5,6 +5,13 @@ resources:
       Type: "AWS::SNS::Topic"
       Properties:
         TopicName: {{sns_topic}}
+        {% if alert_subscribers %}
+        Subscription:
+            {% for subscriber in alert_subscribers %}
+            - Endpoint: "{{subscriber}}"
+              Protocol: "email"
+            {% endfor %}
+        {% endif %}
     {% endif %}
     {% for stream in streams %}
     {% if stream.es_type %}

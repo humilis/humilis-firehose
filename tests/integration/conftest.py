@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 import os
+import subprocess
 import uuid
 
 from humilis.environment import Environment
@@ -34,12 +35,25 @@ def environment(settings):
         env.create(update=True, output_file=settings.output_path)
     else:
         env.create(output_file=settings.output_path)
+
     yield env
-    if os.environ.get("DESTROY", "yes") == "yes":
-        # Empty the S3 bucket
+
+    if os.environ.get("DESTROY", "yes").lower() == "yes":
         bucket = env.outputs["storage"]["BucketName"]
-        os.system("aws s3 rm s3://{} --recursive".format(bucket))
-        env.delete()
+        empty_bucket(bucket)
+        try:
+            env.delete()
+        except AwsError as err:
+            # Some files may have arrived to the bucket after the bucket was
+            # emptied for the first time.
+            empty_bucket(bucket)
+            env.delete()
+
+
+def empty_bucket(bucket):
+    """Empties a S3 bucket."""
+    subprocess.call(["aws", "s3", "rm", "s3://{}/".format(bucket),
+                    "--recursive"], stdout=subprocess.PIPE)
 
 
 @pytest.fixture
