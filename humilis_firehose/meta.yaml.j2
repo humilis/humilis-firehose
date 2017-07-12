@@ -7,7 +7,7 @@
 #
 # Conventions used by this layer:
 #
-# * If the s3_bucket_name parameter is not provided, the bucket name will be 
+# * If the s3_bucket_name parameter is not provided, the bucket name will be
 #   taken from output BucketName from a layer named storage within the current
 #   humilis environment.
 meta:
@@ -27,6 +27,13 @@ meta:
                 topic to be created during the creation of this layer.
             value:
                 {{_env.name}}-{{_env.stage}}-{{_layer.name}}
+
+        alert_subscribers:
+            description:
+                A list of emails to suscribe to the alarms that will be pushed
+                to the sns topic of this environment
+            value:
+                []
 
         # S3 configuration options
         s3_bucket_name:
@@ -52,7 +59,7 @@ meta:
             description:
                 The compression type.
             value:
-               # Values: UNCOMPRESSED, GZIP, ZIP, Snappy 
+               # Values: UNCOMPRESSED, GZIP, ZIP, Snappy
                 GZIP
 
 
@@ -170,7 +177,7 @@ meta:
 
         streams:
             description:
-                The names of the streams and the associated S3 prefixes and, 
+                The names of the streams and the associated S3 prefixes and,
                 optionally, Redshift tables.
             # For backwards compatibility. New environments should use
             # delivery_streams
