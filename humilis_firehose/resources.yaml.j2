@@ -1,5 +1,12 @@
 ---
 resources:
+    {% if decrypt_arn %}
+    DbPasswordDecrypt:
+        Type: "Custom::KMSDecrypt"
+        Properties:
+            ServiceToken: "{{decrypt_arn}}"
+            Ciphertext: "{{redshift_password}}"
+    {% endif %}
     {% if not sns_topic.startswith("arn:") %}
     SnsTopic:
       Type: "AWS::SNS::Topic"
@@ -156,7 +163,12 @@ resources:
             DataTableName: "{{stream.redshift_table}}"
             CopyOptions: "{{redshift_copy_options}}"
           Username: "{{redshift_username}}"
-          Password: "{{redshift_password}}"
+          Password:
+            {% if decrypt_arn %}
+            Fn::Sub: ${DbPasswordDecrypt.Plaintext}
+            {% else %}
+            "{{redshift_password}}"
+            {% endif %}
           RoleARN:
             "Fn::GetAtt":
               - DeliveryStreamRole
