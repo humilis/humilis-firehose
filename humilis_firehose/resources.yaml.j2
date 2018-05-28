@@ -266,6 +266,14 @@ resources:
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
+                {% if processor_arn %}
+                - Effect: "Allow"
+                  Sid: ""
+                  Action:
+                    - "lambda:InvokeFunction",
+                    - "lambda:GetFunctionConfiguration"
+                  Resource: {{processor_arn}}
+                {% endif %}
                 {% if log_group %}
                 - Effect: "Allow"
                   Sid: ""
