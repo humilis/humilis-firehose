@@ -270,7 +270,7 @@ resources:
                 - Effect: "Allow"
                   Sid: ""
                   Action:
-                    - "lambda:InvokeFunction",
+                    - "lambda:InvokeFunction"
                     - "lambda:GetFunctionConfiguration"
                   Resource: {{processor_arn}}
                 {% endif %}
