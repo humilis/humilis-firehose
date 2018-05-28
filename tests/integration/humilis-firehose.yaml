@@ -9,11 +9,18 @@ humilis-firehose:
 
         - layer: logging
 
-        - layer: es
-          layer_type: es
-          whitelisted_ips:
-            - "24.132.203.21/32"
-          domain_name: dummy
+        - layer: transform
+          layer_type: microservice
+          runtime: python2.7
+          lambda_environment:
+            GLOBAL_VAR: GLOBAL_VAL
+          resources:
+              - description: "Identity Transform"
+                path: identity
+                api_key_required: yes
+                handler: "mypkg:transform"
+                lambda_dependencies:
+                    - mycode/mypkg
 
         - layer: delivery
           log_group:
@@ -32,23 +39,12 @@ humilis-firehose:
                   parameters:
                       layer_name: storage
                       output_name: BucketName
-          es_buffer_seconds: 60
-          es_retry_seconds: 60
-          es_index_name: default
-          es_domain_name:
-            ref:
-              parser: output
-              parameters: {"layer_name": "es", "output_name": "EsDomain"}
+          processor_arn:
+              $layer_output:
+                  layer_name: transform
+                  output_name: LambdaArn1
           streams:
               - name: DeliveryStream1
                 s3_prefix: stream1/
               - name: DeliveryStream2
                 s3_prefix: stream2/
-                es_type:
-                  stream2type
-              - name: DeliveryStream3
-                s3_prefix: stream3/
-                es_index_name:
-                    stream3
-                es_type:
-                  stream3type

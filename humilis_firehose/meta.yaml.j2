@@ -15,6 +15,22 @@ meta:
         Firehose delivery streams
 
     parameters:
+        processor_retries:
+            description: Number of retries for the Firehose processor
+            value: 2
+
+        processor_arn:
+            description: ARN of the Lambda transform
+            value:
+
+        processor_buffer_size_in_mbs:
+            description: The buffer size for the transform processor
+            value: 3
+
+        processor_buffer_interval_in_seconds:
+            description: The buffer interval in seconds
+            value: 600
+
         decrypt_arn:
             description: The ARN of the custom resource providing KMS decryption
             value:

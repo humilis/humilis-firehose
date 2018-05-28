@@ -109,7 +109,7 @@ resources:
         {% if stream.s3_prefix and not stream.redshift_table and not stream.es_type %}
         # If Redshift delivery is active then there is no need for an
         # additional S3 delivery configuration.
-        S3DestinationConfiguration:
+        ExtendedS3DestinationConfiguration:
           BucketARN:
             "Fn::Join":
               - ""
@@ -117,6 +117,21 @@ resources:
           BufferingHints:
             SizeInMBs: {{stream.s3_buffer_mbs or s3_buffer_mbs}}
             IntervalInSeconds: {{stream.s3_buffer_seconds or s3_buffer_seconds}}
+          {% if processor_arn %}
+          ProcessingConfiguration:
+            Enabled: yes
+            Processors:
+                - Type: Lambda
+                  Parameters:
+                    - ParameterName: LambdaArn
+                      ParameterValue: "{{processor_arn}}"
+                    - ParameterName: NumberOfRetries
+                      ParameterValue: "{{processor_retries}}"
+                    - ParameterName: BufferSizeInMBs
+                      ParameterValue: "{{processor_buffer_size_in_mbs}}"
+                    - ParameterName: BufferIntervalInSeconds
+                      ParameterValue: "{{processor_buffer_interval_in_seconds}}"
+          {% endif %}
           {% if log_group %}
           CloudWatchLoggingOptions:
             Enabled: True
