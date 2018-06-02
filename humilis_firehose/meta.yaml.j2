@@ -15,6 +15,18 @@ meta:
         Firehose delivery streams
 
     parameters:
+        create_glue_table:
+            description: Should a Glue table be created?
+            value: no
+
+        glue_database_name:
+            description: The name of the Glue database to be created
+            value: {{__context.environment.name + '-' + __context.stage.lower()}}
+
+        crawler_schedule:
+            description: The schedule of the Glue crawler
+            value: "cron(* 0/1 * * ? *)"
+
         processor_retries:
             description: Number of retries for the Firehose processor
             value: 2

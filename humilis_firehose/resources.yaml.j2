@@ -1,5 +1,56 @@
 ---
 resources:
+    {% if create_glue_table %}
+    # AWS Glue resources
+    CrawlerRole:
+        Type: AWS::IAM::Role
+        Properties:
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Principal:
+                  Service:
+                    - "glue.amazonaws.com"
+                Action:
+                  - "sts:AssumeRole"
+          Path: "/"
+          Policies:
+            -
+              PolicyName: "root"
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action: "*"
+                    Resource: "*"
+
+    GlueDatabase:
+        Type: "AWS::Glue::Database"
+        Properties:
+            CatalogId: {Ref: "AWS::AccountId"}
+            DatabaseInput:
+                Name: {{glue_database_name.lower()}}
+
+    InputCrawler:
+        Type: "AWS::Glue::Crawler"
+        Properties:
+            Role: {Ref: CrawlerRole}
+            DatabaseName: {Ref: GlueDatabase}
+            Schedule:
+                ScheduleExpression: "{{crawler_schedule}}"
+            TablePrefix:
+                {{_env.name.replace('-', '').lower()}}_{{_env.stage.lower()}}_
+            Targets:
+                S3Targets:
+                    {% for stream in streams %}
+                    - Path: "{{s3_bucket_name}}/{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
+                    {% endfor %}
+
+    {% endif %}
+
     {% if decrypt_arn %}
     DbPasswordDecrypt:
         Type: "Custom::KMSDecrypt"
