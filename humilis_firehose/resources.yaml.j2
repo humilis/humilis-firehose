@@ -321,9 +321,8 @@ resources:
                 - Effect: "Allow"
                   Sid: ""
                   Action:
-                    - "lambda:InvokeFunction"
-                    - "lambda:GetFunctionConfiguration"
-                  Resource: {{processor_arn}}
+                    - "lambda:*"
+                  Resource: "{{processor_arn}}:*"
                 {% endif %}
                 {% if log_group %}
                 - Effect: "Allow"
