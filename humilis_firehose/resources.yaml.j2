@@ -47,6 +47,15 @@ resources:
                 S3Targets:
                     {% for stream in streams %}
                     - Path: "{{s3_bucket_name}}/{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
+                      {% if stream.crawler_exclusions %}
+                      Exclusions:
+                      {% for exc in stream.crawler_exclusions %}
+                        - "{{exc}}"
+                      {% endfor %}
+                      {% else %}
+                      Exclusions:
+                        - "processing-failed**"
+                      {% endif %}
                     {% endfor %}
 
     {% endif %}
