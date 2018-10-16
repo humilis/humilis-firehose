@@ -331,7 +331,9 @@ resources:
                   Sid: ""
                   Action:
                     - "lambda:*"
-                  Resource: "{{processor_arn}}:*"
+                  Resource:
+                    - "{{processor_arn}}:*"
+                    - "{{processor_arn}}"
                 {% endif %}
                 {% if log_group %}
                 - Effect: "Allow"
