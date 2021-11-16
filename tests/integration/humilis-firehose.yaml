@@ -11,7 +11,7 @@ humilis-firehose:
 
         - layer: transform
           layer_type: microservice
-          runtime: python2.7
+          runtime: python3.9
           lambda_environment:
             GLOBAL_VAR: GLOBAL_VAL
           resources:
@@ -46,5 +46,7 @@ humilis-firehose:
           streams:
               - name: DeliveryStream1
                 s3_prefix: stream1/
+                s3_error_prefix: stream1/errors/
               - name: DeliveryStream2
                 s3_prefix: stream2/
+                s3_error_prefix: stream2/errors/

@@ -200,6 +200,9 @@ resources:
           {% endif %}
           CompressionFormat: "{{stream.s3_compression or s3_compression}}"
           Prefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_prefix}}"
+          {% if stream.s3_error_prefix %}
+          ErrorOutputPrefix: "{{_env.name}}/{{_env.stage}}/{{_layer.name}}/{{stream.s3_error_prefix}}"
+          {% endif %}
           RoleARN:
             "Fn::GetAtt":
               - DeliveryStreamRole
