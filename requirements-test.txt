@@ -4,6 +4,7 @@ pytest
 pyyaml
 mock
 tox
+twine
 
 -e .
 git+https://github.com/humilis/humilis

@@ -11,3 +11,5 @@ layers/lambda-pipeline
 
 # Ignore deployment outputs
 *.outputs.yaml
+
+dist/

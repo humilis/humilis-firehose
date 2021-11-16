@@ -1,6 +1,7 @@
 HUMILIS := .env/bin/humilis
 PIP := .env/bin/pip
 PYTHON := .env/bin/python
+TWINE := .env/bin/twine
 TOX := .env/bin/tox
 STAGE := DEV
 HUMILIS_ENV := tests/integration/humilis-firehose
@@ -47,4 +48,5 @@ delete: develop
 
 # upload to Pypi
 pypi: develop
-	$(PYTHON) setup.py sdist upload
+	$(PYTHON) setup.py sdist
+	$(TWINE) upload dist/*
